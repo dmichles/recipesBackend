@@ -99,6 +99,54 @@ public class RecipeController {
     }
 
     @CrossOrigin(origins = "http://localhost:5173")
+    @PutMapping("/updateRecipe")
+    public ResponseEntity<?> updateRecipe(@RequestBody RecipeDto recipeDto) {
+        Recipe recipe = recipeRepository.findByName(recipeDto.getName());
+        recipe.setComments(recipeDto.getComments());
+        recipe.setServings(recipeDto.getServings());
+        recipe.setSource(recipeDto.getSource());
+        recipe.setTimeInAdvance(recipeDto.getAdvance());
+        recipe.setCategory(categoryRepository.findByName(recipeDto.getCategory()));
+        recipe.setSubcategory(subcategoryRepository.findByName(recipeDto.getSubcategory()));
+        recipe.setType(typeRepository.findByName(recipeDto.getType()));
+        recipe.setRating(ratingRepository.findByName(recipeDto.getRating()));
+        recipe.setPrepMethod(prepMethodRepository.findByName(recipeDto.getPrepMethod()));
+        recipe.setCuisine(cuisineRepository.findByName(recipeDto.getCuisine()));
+
+
+        recipeDto.getPrepSteps().forEach(prepStep -> {
+            RecipePrepStep recipePrepStep = new RecipePrepStep();
+            recipePrepStep.setPrepStepName(prepStep.getPrepStep());
+            recipePrepStep.setRecipe(recipe);
+            recipePrepStepRepository.save(recipePrepStep);
+        });
+
+        recipeDto.getIngredients().forEach(ingredient -> {
+            RecipeIngredient recipeIngredient = new RecipeIngredient();
+            if (ingredientRepository.findByName(ingredient.getName()) != null) {
+                recipeIngredient.setIngredient(ingredientRepository.findByName(ingredient.getName().toLowerCase()));
+                recipeIngredient.setUnit(unitRepository.findByUnitOfMeasure(ingredient.getUnit()));
+                recipeIngredient.setQuantity(ingredient.getQuantity());
+                recipeIngredient.setRecipe(recipe);
+                repository.save(recipeIngredient);
+            } else {
+                Ingredient ing = new Ingredient();
+                ing.setName(ingredient.getName());
+                System.out.println(ing.getName());
+                recipeIngredient.setIngredient(ing);
+                recipeIngredient.setUnit(unitRepository.findByUnitOfMeasure(ingredient.getUnit()));
+                recipeIngredient.setQuantity(ingredient.getQuantity());
+                recipeIngredient.setRecipe(recipe);
+                System.out.println(recipeIngredient.getIngredient().getName());
+                repository.save(recipeIngredient);
+            }
+        });
+        CreateRecipeDto createRecipeDto = new CreateRecipeDto();
+        createRecipeDto.setMessage("Recipe updated successfully");
+        return ResponseEntity.ok(createRecipeDto);
+    }
+
+    @CrossOrigin(origins = "http://localhost:5173")
     @GetMapping("/getRecipe")
     public ResponseEntity<?> getRecipe(@RequestParam String name) {
         if (name == null || name.isEmpty() || recipeRepository.findByName(name) == null){
