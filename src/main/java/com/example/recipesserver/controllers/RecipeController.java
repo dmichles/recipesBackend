@@ -101,6 +101,7 @@ public class RecipeController {
     @CrossOrigin(origins = "http://localhost:5173")
     @PutMapping("/updateRecipe")
     public ResponseEntity<?> updateRecipe(@RequestBody RecipeDto recipeDto) {
+        System.out.println(recipeDto);
         Recipe recipe = recipeRepository.findByName(recipeDto.getName());
         recipe.setComments(recipeDto.getComments());
         recipe.setServings(recipeDto.getServings());
