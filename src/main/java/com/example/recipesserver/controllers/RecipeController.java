@@ -5,6 +5,7 @@ import com.example.recipesserver.models.dto.*;
 import com.example.recipesserver.models.entities.*;
 import com.example.recipesserver.models.repositories.*;
 import com.example.recipesserver.utilities.SortPrepStepsById;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -100,6 +101,7 @@ public class RecipeController {
 
     @CrossOrigin(origins = "http://localhost:5173")
     @PutMapping("/updateRecipe")
+    @Transactional
     public ResponseEntity<?> updateRecipe(@RequestBody RecipeDto recipeDto) {
         System.out.println(recipeDto);
         Recipe recipe = recipeRepository.findByName(recipeDto.getName());
@@ -114,14 +116,14 @@ public class RecipeController {
         recipe.setPrepMethod(prepMethodRepository.findByName(recipeDto.getPrepMethod()));
         recipe.setCuisine(cuisineRepository.findByName(recipeDto.getCuisine()));
 
-
+        recipePrepStepRepository.deleteAllByRecipeName(recipeDto.getName());
         recipeDto.getPrepSteps().forEach(prepStep -> {
             RecipePrepStep recipePrepStep = new RecipePrepStep();
             recipePrepStep.setPrepStepName(prepStep.getPrepStep());
             recipePrepStep.setRecipe(recipe);
             recipePrepStepRepository.save(recipePrepStep);
         });
-
+        repository.deleteByRecipeName(recipeDto.getName());
         recipeDto.getIngredients().forEach(ingredient -> {
             RecipeIngredient recipeIngredient = new RecipeIngredient();
             if (ingredientRepository.findByName(ingredient.getName()) != null) {

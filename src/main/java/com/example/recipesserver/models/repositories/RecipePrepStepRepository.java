@@ -8,4 +8,5 @@ import java.util.Set;
 
 public interface RecipePrepStepRepository extends JpaRepository<RecipePrepStep, Long> {
     List<RecipePrepStep> findAllByRecipeName(String name);
+    void deleteAllByRecipeName(String name);
 }
