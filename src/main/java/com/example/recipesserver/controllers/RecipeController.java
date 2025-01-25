@@ -44,9 +44,26 @@ public class RecipeController {
         this.cuisineRepository = cuisineRepository;
         this.recipePrepStepRepository = recipePrepStepRepository;
     }
+
+    @CrossOrigin(origins = "http://localhost:5173")
+    @PostMapping("/deleteRecipe")
+    @Transactional
+    public ResponseEntity<?> deleteRecipe(@RequestParam String name){
+        Recipe recipe = recipeRepository.findByName(name);
+
+        Set<RecipeIngredient> recipeIngredients = repository.findAllByRecipeName(name);
+        recipeIngredients.forEach(recipeIngredient -> {
+            repository.delete(recipeIngredient);
+        });
+        recipePrepStepRepository.deleteAllByRecipeName(name);
+        recipeRepository.delete(recipe);
+        return ResponseEntity.ok().build();
+    }
+
     @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping ("/addRecipe")
     public ResponseEntity<?> createRecipe(@RequestBody RecipeDto recipeDto) {
+        System.out.println(recipeDto);
         if (recipeRepository.findByName(recipeDto.getName()) != null) {
             CreateRecipeDto createRecipeDto = new CreateRecipeDto();
             createRecipeDto.setMessage("Recipe already exists");
@@ -104,46 +121,62 @@ public class RecipeController {
     @Transactional
     public ResponseEntity<?> updateRecipe(@RequestBody RecipeDto recipeDto) {
         System.out.println(recipeDto);
-        Recipe recipe = recipeRepository.findByName(recipeDto.getName());
-        recipe.setComments(recipeDto.getComments());
-        recipe.setServings(recipeDto.getServings());
-        recipe.setSource(recipeDto.getSource());
-        recipe.setTimeInAdvance(recipeDto.getAdvance());
-        recipe.setCategory(categoryRepository.findByName(recipeDto.getCategory()));
-        recipe.setSubcategory(subcategoryRepository.findByName(recipeDto.getSubcategory()));
-        recipe.setType(typeRepository.findByName(recipeDto.getType()));
-        recipe.setRating(ratingRepository.findByName(recipeDto.getRating()));
-        recipe.setPrepMethod(prepMethodRepository.findByName(recipeDto.getPrepMethod()));
-        recipe.setCuisine(cuisineRepository.findByName(recipeDto.getCuisine()));
-
-        recipePrepStepRepository.deleteAllByRecipeName(recipeDto.getName());
-        recipeDto.getPrepSteps().forEach(prepStep -> {
-            RecipePrepStep recipePrepStep = new RecipePrepStep();
-            recipePrepStep.setPrepStepName(prepStep.getPrepStep());
-            recipePrepStep.setRecipe(recipe);
-            recipePrepStepRepository.save(recipePrepStep);
-        });
-        repository.deleteByRecipeName(recipeDto.getName());
-        recipeDto.getIngredients().forEach(ingredient -> {
-            RecipeIngredient recipeIngredient = new RecipeIngredient();
-            if (ingredientRepository.findByName(ingredient.getName()) != null) {
-                recipeIngredient.setIngredient(ingredientRepository.findByName(ingredient.getName().toLowerCase()));
-                recipeIngredient.setUnit(unitRepository.findByUnitOfMeasure(ingredient.getUnit()));
-                recipeIngredient.setQuantity(ingredient.getQuantity());
-                recipeIngredient.setRecipe(recipe);
-                repository.save(recipeIngredient);
-            } else {
-                Ingredient ing = new Ingredient();
-                ing.setName(ingredient.getName());
-                System.out.println(ing.getName());
-                recipeIngredient.setIngredient(ing);
-                recipeIngredient.setUnit(unitRepository.findByUnitOfMeasure(ingredient.getUnit()));
-                recipeIngredient.setQuantity(ingredient.getQuantity());
-                recipeIngredient.setRecipe(recipe);
-                System.out.println(recipeIngredient.getIngredient().getName());
-                repository.save(recipeIngredient);
-            }
-        });
+//        Optional<Recipe> recipe = recipeRepository.findById(Long.valueOf(recipeDto.getId()));
+//        recipe.get().setName(recipeDto.getName());
+//        recipe.get().setComments(recipeDto.getComments());
+//        recipe.get().setServings(recipeDto.getServings());
+//        recipe.get().setSource(recipeDto.getSource());
+//        recipe.get().setTimeInAdvance(recipeDto.getAdvance());
+//        recipe.get().setCategory(categoryRepository.findByName(recipeDto.getCategory()));
+//        recipe.get().setSubcategory(subcategoryRepository.findByName(recipeDto.getSubcategory()));
+//        recipe.get().setType(typeRepository.findByName(recipeDto.getType()));
+//        recipe.get().setRating(ratingRepository.findByName(recipeDto.getRating()));
+//        recipe.get().setPrepMethod(prepMethodRepository.findByName(recipeDto.getPrepMethod()));
+//        recipe.get().setCuisine(cuisineRepository.findByName(recipeDto.getCuisine()));
+//
+//        recipeDto.getPrepSteps().forEach(prepStep -> {
+//            Optional<RecipePrepStep> recipePrepStep = recipePrepStepRepository.findByRecipePrepStepId(Long.valueOf(prepStep.getId()));
+//            if (recipePrepStep.isPresent()) {
+//                recipePrepStep.get().setPrepStepName(prepStep.getPrepStep());
+//                recipePrepStep.get().setRecipe(recipe.get());
+//            } else {
+//                RecipePrepStep recipePrepStep1 = new RecipePrepStep();
+//                recipePrepStep1.setPrepStepName(prepStep.getPrepStep());
+//                recipePrepStep1.setRecipe(recipe.get());
+//            }
+//            recipePrepStepRepository.save(recipePrepStep.get());
+//        });
+//
+//        recipeDto.getIngredients().forEach(ingredient -> {
+//            Optional<RecipeIngredient> recipeIngredient = repository.findById(Long.valueOf(ingredient.getId()));
+//            if (recipeIngredient.isPresent()) {
+//                if(ingredientRepository.findByName(ingredient.getName()) != null) {
+//                    recipeIngredient.get().setIngredient(ingredientRepository.findByName(ingredient.getName().toLowerCase()));
+//                } else {
+//                    Ingredient newIngredient = new Ingredient();
+//                    newIngredient.setName(ingredient.getName());
+//                    recipeIngredient.get().setIngredient(newIngredient);
+//                }
+//                recipeIngredient.get().setUnit(unitRepository.findByUnitOfMeasure(ingredient.getUnit()));
+//                recipeIngredient.get().setQuantity(ingredient.getQuantity());
+//                recipeIngredient.get().setRecipe(recipe.get());
+//                repository.save(recipeIngredient.get());
+//            } else {
+//                RecipeIngredient recipeIng = new RecipeIngredient();
+//                if (ingredientRepository.findByName(ingredient.getName()) != null) {
+//                    recipeIng.setIngredient(ingredientRepository.findByName(ingredient.getName()));
+//                } else {
+//                    Ingredient ing = new Ingredient();
+//                    ing.setName(ingredient.getName());
+//                    recipeIng.setIngredient(ing);
+//                }
+//                recipeIng.setUnit(unitRepository.findByUnitOfMeasure(ingredient.getUnit()));
+//                recipeIng.setQuantity(ingredient.getQuantity());
+//                recipeIng.setRecipe(recipe.get());
+//                System.out.println(recipeIng.getIngredient().getName());
+//                repository.save(recipeIng);
+//            }
+//        });
         CreateRecipeDto createRecipeDto = new CreateRecipeDto();
         createRecipeDto.setMessage("Recipe updated successfully");
         return ResponseEntity.ok(createRecipeDto);
@@ -157,6 +190,7 @@ public class RecipeController {
         }
         Recipe recipe = recipeRepository.findByName(name);
         RecipeDto recipeDto = new RecipeDto();
+        recipeDto.setId(String.valueOf(recipe.getRecipeId()));
         recipeDto.setName(recipe.getName());
         recipeDto.setComments(recipe.getComments());
         recipeDto.setServings(recipe.getServings());
@@ -172,6 +206,7 @@ public class RecipeController {
         Set<RecipeIngredient> recipeIngredients = repository.findAllByRecipeName(name);
         recipeIngredients.forEach(ingredient -> {
             IngredientDto ingredientDto = new IngredientDto();
+            ingredientDto.setId(String.valueOf(ingredient.getId()));
             ingredientDto.setName(ingredient.getIngredient().getName());
             ingredientDto.setQuantity(ingredient.getQuantity());
             ingredientDto.setUnit(ingredient.getUnit().getUnitOfMeasure());
@@ -184,6 +219,7 @@ public class RecipeController {
         Collections.sort(recipePrepSteps, new SortPrepStepsById());
         recipePrepSteps.forEach(recipePrepStep -> {
             PrepStepDto PrepStepDto = new PrepStepDto();
+            PrepStepDto.setId(String.valueOf(recipePrepStep.getRecipePrepStepId()));
             PrepStepDto.setPrepStep(recipePrepStep.getPrepStepName());
             prepSteps.add(PrepStepDto);
         });

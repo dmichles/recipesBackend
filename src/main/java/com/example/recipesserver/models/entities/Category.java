@@ -24,6 +24,14 @@ public class Category {
 
     }
 
+    public Set<Recipe> getRecipes() {
+        return recipes;
+    }
+
+    public void setRecipes(Set<Recipe> recipes) {
+        this.recipes = recipes;
+    }
+
     public Long getCategoryId() {
         return categoryId;
     }

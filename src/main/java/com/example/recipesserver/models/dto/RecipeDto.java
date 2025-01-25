@@ -3,6 +3,7 @@ package com.example.recipesserver.models.dto;
 import java.util.List;
 
 public class RecipeDto {
+    private String id;
     private String name;
     private String category;
     private String subcategory;
@@ -125,9 +126,18 @@ public class RecipeDto {
         return prepSteps;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "RecipeDto{" +
+                "id='" + id + '\'' +
                 "name='" + name + '\'' +
                 ", category='" + category + '\'' +
                 ", subcategory='" + subcategory + '\'' +

@@ -1,12 +1,20 @@
 package com.example.recipesserver.models.dto;
 
 public class IngredientDto {
+    private String id;
     private String name;
     private String unit;
     private String quantity;
 
     public IngredientDto() {}
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -35,6 +43,7 @@ public class IngredientDto {
     @Override
     public String toString() {
         return "IngredientDto{" +
+                "id='" + id + '\'' +
                 "name='" + name + '\'' +
                 ", unit='" + unit + '\'' +
                 ", quantity='" + quantity + '\'' +
