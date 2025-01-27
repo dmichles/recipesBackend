@@ -6,7 +6,6 @@ import com.example.recipesserver.models.entities.*;
 import com.example.recipesserver.models.repositories.*;
 import com.example.recipesserver.utilities.SortPrepStepsById;
 import jakarta.transaction.Transactional;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -226,17 +225,17 @@ public class RecipeController {
         recipeDto.setPrepSteps(prepSteps);
         return ResponseEntity.ok(recipeDto);
     }
-    @CrossOrigin(origins = "http://localhost:5173")
-    @GetMapping("/getRecipeNames")
-    public ResponseEntity<?> getRecipeNames() {
-        List<RecipeNameDto> names = new ArrayList<>();
-        recipeRepository.findAll().forEach(recipe -> {
-            RecipeNameDto nameDto = new RecipeNameDto();
-            nameDto.setName(recipe.getName());
-            names.add(nameDto);
-        });
-        return ResponseEntity.ok(names);
-    }
+//    @CrossOrigin(origins = "http://localhost:5173")
+//    @GetMapping("/getRecipeNames")
+//    public ResponseEntity<?> getRecipeNames() {
+//        List<RecipeNameDto> names = new ArrayList<>();
+//        recipeRepository.findAll().forEach(recipe -> {
+//            RecipeNameDto nameDto = new RecipeNameDto();
+//            nameDto.setName(recipe.getName());
+//            names.add(nameDto);
+//        });
+//        return ResponseEntity.ok(names);
+//    }
 
 //    public void addRecipe(@RequestBody RecipeDto recipeDto) {
 //        System.out.println(recipeDto.getName());
@@ -248,17 +247,51 @@ public class RecipeController {
 //        });
 //    }
     @CrossOrigin(origins = "http://localhost:5173")
-    @GetMapping("/getRecipeNamesByCategory")
-    public ResponseEntity<?> getRecipeNamesByCategory(@RequestParam String category) {
+    @GetMapping("/getRecipeNames")
+    public ResponseEntity<?> getRecipeNames(@RequestParam String category, @RequestParam String subcategory,
+                                            @RequestParam String type, @RequestParam String prepMethod,
+                                            @RequestParam String ingredient) {
+        if (category.isEmpty()) category = null;
+        if (subcategory.isEmpty()) subcategory = null;
+        if (type.isEmpty()) type = null;
+        if (prepMethod.isEmpty()) prepMethod = null;
+        if (ingredient.isEmpty()) ingredient = null;
+
         List<RecipeNameDto> names = new ArrayList<>();
-        Category cat = categoryRepository.findByName(category);
-        recipeRepository.findAllByCategory(cat).forEach(recipe -> {
+        if (category == null &&  subcategory == null && type == null &&  prepMethod == null && ingredient == null) {
+            return ResponseEntity.ok(names);
+        }
+        if (subcategory == null) {
+            System.out.println("subcategory is null");
+        }
+        System.out.println("category " + category);
+        System.out.println("subcategory " + subcategory);
+        System.out.println("type " + type);
+        System.out.println("prepMethod " + prepMethod);
+        System.out.println("ingredient " + ingredient);
+
+
+        recipeRepository.findRecipeNames(ingredient, category, subcategory, type, prepMethod).forEach(recipe -> {
             RecipeNameDto nameDto = new RecipeNameDto();
             nameDto.setName(recipe.getName());
             names.add(nameDto);
         });
+        System.out.println("names" + names);
         return ResponseEntity.ok(names);
     }
+
+//    @CrossOrigin(origins = "http://localhost:5173")
+//    @GetMapping("/getRecipeNamesByIngredient")
+//    public ResponseEntity<?> getRecipeNamesByIngredient(@RequestParam String ingredient) {
+//        List<RecipeNameDto> names = new ArrayList<>();
+//        Ingredient ing = ingredientRepository.findByName(ingredient);
+//        recipeRepository.findRecipeByIngredientName(ing.getName(), "Mains").forEach(recipe -> {
+//            RecipeNameDto nameDto = new RecipeNameDto();
+//            nameDto.setName(recipe.getName());
+//            names.add(nameDto);
+//        });
+//        return ResponseEntity.ok(names);
+//    }
 
     @CrossOrigin(origins = "http://localhost:5173")
     @GetMapping("/getCuisines")

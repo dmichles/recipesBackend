@@ -11,4 +11,11 @@ public class RecipeNameDto {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+    public String toString() {
+        return "RecipeNameDto{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }

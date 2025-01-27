@@ -17,7 +17,8 @@ public class Subcategory {
     private String name;
 
     @OneToMany
-    private Set<Category> categories  = new HashSet<>();
+    @JoinColumn(name = "recipe_id")
+    private Set<Recipe> recipes  = new HashSet<>();
 
     public Subcategory() {}
 
@@ -37,11 +38,11 @@ public class Subcategory {
         this.name = name;
     }
 
-    public Set<Category> getCategories() {
-        return categories;
+    public Set<Recipe> getRecipes() {
+        return recipes;
     }
 
-    public void setCategories(Set<Category> categories) {
-        this.categories = categories;
+    public void setRecipes(Set<Recipe> recipes) {
+        this.recipes = recipes;
     }
 }

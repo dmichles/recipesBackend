@@ -6,11 +6,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "PrepMethod")
+@Table(name = "prep_method")
 public class PrepMethod {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "prep_id")
     private Long prepId;
 
     private String name;
