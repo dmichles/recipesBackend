@@ -249,16 +249,17 @@ public class RecipeController {
     @CrossOrigin(origins = "http://localhost:5173")
     @GetMapping("/getRecipeNames")
     public ResponseEntity<?> getRecipeNames(@RequestParam String category, @RequestParam String subcategory,
-                                            @RequestParam String type, @RequestParam String prepMethod,
-                                            @RequestParam String ingredient) {
+                                            @RequestParam String type, @RequestParam String cuisine,
+                                            @RequestParam String prepMethod, @RequestParam String ingredient) {
         if (category.isEmpty()) category = null;
         if (subcategory.isEmpty()) subcategory = null;
         if (type.isEmpty()) type = null;
+        if (cuisine.isEmpty()) cuisine = null;
         if (prepMethod.isEmpty()) prepMethod = null;
         if (ingredient.isEmpty()) ingredient = null;
 
         List<RecipeNameDto> names = new ArrayList<>();
-        if (category == null &&  subcategory == null && type == null &&  prepMethod == null && ingredient == null) {
+        if (category == null &&  subcategory == null && type == null &&  prepMethod == null && ingredient == null && cuisine == null) {
             return ResponseEntity.ok(names);
         }
         if (subcategory == null) {
@@ -271,7 +272,7 @@ public class RecipeController {
         System.out.println("ingredient " + ingredient);
 
 
-        recipeRepository.findRecipeNames(ingredient, category, subcategory, type, prepMethod).forEach(recipe -> {
+        recipeRepository.findRecipeNames(ingredient, category, subcategory, type, prepMethod, cuisine).forEach(recipe -> {
             RecipeNameDto nameDto = new RecipeNameDto();
             nameDto.setName(recipe.getName());
             names.add(nameDto);
