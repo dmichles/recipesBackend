@@ -17,7 +17,6 @@ public class Subcategory {
     private String name;
 
     @OneToMany
-    @JoinColumn(name = "recipe_id")
     private Set<Recipe> recipes  = new HashSet<>();
 
     public Subcategory() {}

@@ -5,6 +5,7 @@ import com.example.recipesserver.models.dto.*;
 import com.example.recipesserver.models.entities.*;
 import com.example.recipesserver.models.repositories.*;
 import com.example.recipesserver.utilities.SortPrepStepsById;
+import com.example.recipesserver.utilities.SortRecipeIngredientsById;
 import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,7 +51,7 @@ public class RecipeController {
     public ResponseEntity<?> deleteRecipe(@RequestParam String name){
         Recipe recipe = recipeRepository.findByName(name);
 
-        Set<RecipeIngredient> recipeIngredients = repository.findAllByRecipeName(name);
+        List<RecipeIngredient> recipeIngredients = repository.findAllByRecipeName(name);
         recipeIngredients.forEach(recipeIngredient -> {
             repository.delete(recipeIngredient);
         });
@@ -120,62 +121,66 @@ public class RecipeController {
     @Transactional
     public ResponseEntity<?> updateRecipe(@RequestBody RecipeDto recipeDto) {
         System.out.println(recipeDto);
-//        Optional<Recipe> recipe = recipeRepository.findById(Long.valueOf(recipeDto.getId()));
-//        recipe.get().setName(recipeDto.getName());
-//        recipe.get().setComments(recipeDto.getComments());
-//        recipe.get().setServings(recipeDto.getServings());
-//        recipe.get().setSource(recipeDto.getSource());
-//        recipe.get().setTimeInAdvance(recipeDto.getAdvance());
-//        recipe.get().setCategory(categoryRepository.findByName(recipeDto.getCategory()));
-//        recipe.get().setSubcategory(subcategoryRepository.findByName(recipeDto.getSubcategory()));
-//        recipe.get().setType(typeRepository.findByName(recipeDto.getType()));
-//        recipe.get().setRating(ratingRepository.findByName(recipeDto.getRating()));
-//        recipe.get().setPrepMethod(prepMethodRepository.findByName(recipeDto.getPrepMethod()));
-//        recipe.get().setCuisine(cuisineRepository.findByName(recipeDto.getCuisine()));
-//
-//        recipeDto.getPrepSteps().forEach(prepStep -> {
-//            Optional<RecipePrepStep> recipePrepStep = recipePrepStepRepository.findByRecipePrepStepId(Long.valueOf(prepStep.getId()));
-//            if (recipePrepStep.isPresent()) {
-//                recipePrepStep.get().setPrepStepName(prepStep.getPrepStep());
-//                recipePrepStep.get().setRecipe(recipe.get());
-//            } else {
-//                RecipePrepStep recipePrepStep1 = new RecipePrepStep();
-//                recipePrepStep1.setPrepStepName(prepStep.getPrepStep());
-//                recipePrepStep1.setRecipe(recipe.get());
-//            }
-//            recipePrepStepRepository.save(recipePrepStep.get());
-//        });
-//
-//        recipeDto.getIngredients().forEach(ingredient -> {
-//            Optional<RecipeIngredient> recipeIngredient = repository.findById(Long.valueOf(ingredient.getId()));
-//            if (recipeIngredient.isPresent()) {
-//                if(ingredientRepository.findByName(ingredient.getName()) != null) {
-//                    recipeIngredient.get().setIngredient(ingredientRepository.findByName(ingredient.getName().toLowerCase()));
-//                } else {
-//                    Ingredient newIngredient = new Ingredient();
-//                    newIngredient.setName(ingredient.getName());
-//                    recipeIngredient.get().setIngredient(newIngredient);
-//                }
-//                recipeIngredient.get().setUnit(unitRepository.findByUnitOfMeasure(ingredient.getUnit()));
-//                recipeIngredient.get().setQuantity(ingredient.getQuantity());
-//                recipeIngredient.get().setRecipe(recipe.get());
-//                repository.save(recipeIngredient.get());
-//            } else {
-//                RecipeIngredient recipeIng = new RecipeIngredient();
-//                if (ingredientRepository.findByName(ingredient.getName()) != null) {
-//                    recipeIng.setIngredient(ingredientRepository.findByName(ingredient.getName()));
-//                } else {
-//                    Ingredient ing = new Ingredient();
-//                    ing.setName(ingredient.getName());
-//                    recipeIng.setIngredient(ing);
-//                }
-//                recipeIng.setUnit(unitRepository.findByUnitOfMeasure(ingredient.getUnit()));
-//                recipeIng.setQuantity(ingredient.getQuantity());
-//                recipeIng.setRecipe(recipe.get());
-//                System.out.println(recipeIng.getIngredient().getName());
-//                repository.save(recipeIng);
-//            }
-//        });
+        Optional<Recipe> recipe = recipeRepository.findById(Long.valueOf(recipeDto.getId()));
+        recipe.get().setName(recipeDto.getName());
+        recipe.get().setComments(recipeDto.getComments());
+        recipe.get().setServings(recipeDto.getServings());
+        recipe.get().setSource(recipeDto.getSource());
+        recipe.get().setTimeInAdvance(recipeDto.getAdvance());
+        recipe.get().setCategory(categoryRepository.findByName(recipeDto.getCategory()));
+        recipe.get().setSubcategory(subcategoryRepository.findByName(recipeDto.getSubcategory()));
+        recipe.get().setType(typeRepository.findByName(recipeDto.getType()));
+        recipe.get().setRating(ratingRepository.findByName(recipeDto.getRating()));
+        recipe.get().setPrepMethod(prepMethodRepository.findByName(recipeDto.getPrepMethod()));
+        recipe.get().setCuisine(cuisineRepository.findByName(recipeDto.getCuisine()));
+
+        recipeDto.getPrepSteps().forEach(prepStep -> {
+            Optional<RecipePrepStep> recipePrepStep = recipePrepStepRepository.findByRecipePrepStepId(Long.valueOf(prepStep.getId()));
+            if (recipePrepStep.isPresent()) {
+                recipePrepStep.get().setPrepStepName(prepStep.getPrepStep());
+                recipePrepStep.get().setRecipe(recipe.get());
+                recipePrepStepRepository.save(recipePrepStep.get());
+            } else {
+                RecipePrepStep recipePrepStep1 = new RecipePrepStep();
+                recipePrepStep1.setPrepStepName(prepStep.getPrepStep());
+                recipePrepStep1.setRecipe(recipe.get());
+                recipePrepStepRepository.save(recipePrepStep1);
+            }
+        });
+
+        recipeDto.getIngredients().forEach(ingredient -> {
+            Optional<RecipeIngredient> recipeIngredient = repository.findById(Long.valueOf(ingredient.getId()));
+            if (recipeIngredient.isPresent()) {
+                System.out.println("here");
+                System.out.println(ingredient.getQuantity());
+                if(ingredientRepository.findByName(ingredient.getName()) != null) {
+                    recipeIngredient.get().setIngredient(ingredientRepository.findByName(ingredient.getName().toLowerCase()));
+                } else {
+                    Ingredient newIngredient = new Ingredient();
+                    newIngredient.setName(ingredient.getName());
+                    ingredientRepository.save(newIngredient);
+                    recipeIngredient.get().setIngredient(newIngredient);
+                }
+                recipeIngredient.get().setUnit(unitRepository.findByUnitOfMeasure(ingredient.getUnit()));
+                recipeIngredient.get().setQuantity(ingredient.getQuantity());
+                recipeIngredient.get().setRecipe(recipe.get());
+                repository.save(recipeIngredient.get());
+            } else {
+                RecipeIngredient recipeIng = new RecipeIngredient();
+                if (ingredientRepository.findByName(ingredient.getName()) != null) {
+                    recipeIng.setIngredient(ingredientRepository.findByName(ingredient.getName()));
+                } else {
+                    Ingredient ing = new Ingredient();
+                    ing.setName(ingredient.getName());
+                    recipeIng.setIngredient(ing);
+                }
+                recipeIng.setUnit(unitRepository.findByUnitOfMeasure(ingredient.getUnit()));
+                recipeIng.setQuantity(ingredient.getQuantity());
+                recipeIng.setRecipe(recipe.get());
+                System.out.println(recipeIng.getIngredient().getName());
+                repository.save(recipeIng);
+            }
+        });
         CreateRecipeDto createRecipeDto = new CreateRecipeDto();
         createRecipeDto.setMessage("Recipe updated successfully");
         return ResponseEntity.ok(createRecipeDto);
@@ -202,7 +207,8 @@ public class RecipeController {
         recipeDto.setPrepMethod(recipe.getPrepMethod().getName());
         recipeDto.setCuisine(recipe.getCuisine().getName());
         List<IngredientDto> ingredients = new ArrayList<>();
-        Set<RecipeIngredient> recipeIngredients = repository.findAllByRecipeName(name);
+        List<RecipeIngredient> recipeIngredients = repository.findAllByRecipeName(name);
+        Collections.sort(recipeIngredients, new SortRecipeIngredientsById());
         recipeIngredients.forEach(ingredient -> {
             IngredientDto ingredientDto = new IngredientDto();
             ingredientDto.setId(String.valueOf(ingredient.getId()));
