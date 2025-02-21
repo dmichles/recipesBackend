@@ -13,7 +13,9 @@ import java.util.Set;
 @Repository
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     Optional<Recipe> findById(Long id);
+
     Recipe findByName(String name);
+
     List<Recipe> findAll();
 
     List<Recipe> findAllByCategoryAndSubcategory(Category category, Subcategory subcategory);
@@ -32,12 +34,14 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             + "AND (:typeName IS NULL OR t.name =:typeName) "
             + "AND (:prepMethodName IS NULL OR p.name =:prepMethodName) "
             + "AND (:cuisineName IS NULL OR cu.name =:cuisineName)",
-             nativeQuery = true)
+            nativeQuery = true)
     List<Recipe> findRecipeNames(@Param("ingredientName") String ingredientName,
                                  @Param("categoryName") String categoryName,
                                  @Param("subcategoryName") String subcategoryName,
                                  @Param("typeName") String typeName,
                                  @Param("prepMethodName") String prepMethodName,
                                  @Param("cuisineName") String cuisineName);
-}
 
+    @Query(value = "SELECT DISTINCT Recipe.name FROM Recipe WHERE Recipe.name LIKE :name%", nativeQuery = true)
+    List<String> getNames(@Param("name") String name);
+}
