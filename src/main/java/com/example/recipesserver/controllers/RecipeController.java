@@ -235,6 +235,9 @@ public class RecipeController {
     @GetMapping("/getRecipeNames")
     public ResponseEntity<?> getRecipeNames(@RequestParam String name) {
         List<RecipeNameDto> recipeNameDtos = new ArrayList<>();
+        if (name == null || name.isEmpty()) {
+            return ResponseEntity.ok(recipeNameDtos);
+        }
         recipeRepository.getNames(name).forEach(recipe -> {
             RecipeNameDto recipeNameDto = new RecipeNameDto();
             recipeNameDto.setId(recipe.getRecipeId());
