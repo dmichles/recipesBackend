@@ -46,29 +46,27 @@ public class RecipeController {
     }
 
     @CrossOrigin(origins = "http://localhost:5173")
-    @PostMapping("/deleteRecipe")
+    @DeleteMapping("/deleteRecipe")
     @Transactional
-    public ResponseEntity<?> deleteRecipe(@RequestParam String name){
-        Recipe recipe = recipeRepository.findByName(name);
+    public ResponseEntity<?> deleteRecipe(@RequestParam String id){
+        Recipe recipe = recipeRepository.findById(Long.valueOf(id)).get();
 
-        List<RecipeIngredient> recipeIngredients = repository.findAllByRecipeName(name);
+        List<RecipeIngredient> recipeIngredients = repository.findAllByRecipeId(Long.valueOf(id));
         recipeIngredients.forEach(recipeIngredient -> {
             repository.delete(recipeIngredient);
         });
-        recipePrepStepRepository.deleteAllByRecipeName(name);
+        recipePrepStepRepository.findAllByRecipeId(Long.valueOf(id)).forEach(recipePrepStep -> {
+            recipePrepStepRepository.delete(recipePrepStep);
+        });
         recipeRepository.delete(recipe);
+        System.out.println("recipe deleted"+id);
         return ResponseEntity.ok().build();
     }
 
     @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping ("/addRecipe")
     public ResponseEntity<?> createRecipe(@RequestBody RecipeDto recipeDto) {
-        System.out.println(recipeDto);
-        if (recipeRepository.findByName(recipeDto.getName()) != null) {
-            CreateRecipeDto createRecipeDto = new CreateRecipeDto();
-            createRecipeDto.setMessage("Recipe already exists");
-            return ResponseEntity.ok(createRecipeDto);
-        }
+
         System.out.println(recipeDto);
         Recipe recipe = new Recipe();
         recipe.setName(recipeDto.getName());
@@ -188,11 +186,11 @@ public class RecipeController {
 
     @CrossOrigin(origins = "http://localhost:5173")
     @GetMapping("/getRecipe")
-    public ResponseEntity<?> getRecipe(@RequestParam String name) {
-        if (name == null || name.isEmpty() || recipeRepository.findByName(name) == null){
+    public ResponseEntity<?> getRecipe(@RequestParam String id) {
+        if (id == null || id.isEmpty() || recipeRepository.findById(Long.valueOf(id)).isEmpty()){
             return ResponseEntity.ok("");
         }
-        Recipe recipe = recipeRepository.findByName(name);
+        Recipe recipe = recipeRepository.findById(Long.valueOf(id)).get();
         RecipeDto recipeDto = new RecipeDto();
         recipeDto.setId(String.valueOf(recipe.getRecipeId()));
         recipeDto.setName(recipe.getName());
@@ -207,7 +205,7 @@ public class RecipeController {
         recipeDto.setPrepMethod(recipe.getPrepMethod().getName());
         recipeDto.setCuisine(recipe.getCuisine().getName());
         List<IngredientDto> ingredients = new ArrayList<>();
-        List<RecipeIngredient> recipeIngredients = repository.findAllByRecipeName(name);
+        List<RecipeIngredient> recipeIngredients = repository.findAllByRecipeId(Long.valueOf(id));
         Collections.sort(recipeIngredients, new SortRecipeIngredientsById());
         recipeIngredients.forEach(ingredient -> {
             IngredientDto ingredientDto = new IngredientDto();
@@ -220,7 +218,7 @@ public class RecipeController {
         recipeDto.setIngredients(ingredients);
 
         List<PrepStepDto> prepSteps = new ArrayList<>();
-        List<RecipePrepStep> recipePrepSteps = recipePrepStepRepository.findAllByRecipeName(name);
+        List<RecipePrepStep> recipePrepSteps = recipePrepStepRepository.findAllByRecipeId(Long.valueOf(id));
         Collections.sort(recipePrepSteps, new SortPrepStepsById());
         recipePrepSteps.forEach(recipePrepStep -> {
             PrepStepDto PrepStepDto = new PrepStepDto();
@@ -237,9 +235,10 @@ public class RecipeController {
     @GetMapping("/getRecipeNames")
     public ResponseEntity<?> getRecipeNames(@RequestParam String name) {
         List<RecipeNameDto> recipeNameDtos = new ArrayList<>();
-        recipeRepository.getNames(name).forEach(recipeName -> {
+        recipeRepository.getNames(name).forEach(recipe -> {
             RecipeNameDto recipeNameDto = new RecipeNameDto();
-            recipeNameDto.setName(recipeName);
+            recipeNameDto.setId(recipe.getRecipeId());
+            recipeNameDto.setName(recipe.getName());
             recipeNameDtos.add(recipeNameDto);
         });
         return ResponseEntity.ok(recipeNameDtos);
@@ -273,6 +272,7 @@ public class RecipeController {
 
         recipeRepository.findRecipeNames(ingredient, category, subcategory, type, prepMethod, cuisine).forEach(recipe -> {
             RecipeNameDto nameDto = new RecipeNameDto();
+            nameDto.setId(recipe.getRecipeId());
             nameDto.setName(recipe.getName());
             names.add(nameDto);
         });

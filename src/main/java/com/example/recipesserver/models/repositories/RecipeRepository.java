@@ -42,6 +42,6 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
                                  @Param("prepMethodName") String prepMethodName,
                                  @Param("cuisineName") String cuisineName);
 
-    @Query(value = "SELECT DISTINCT Recipe.name FROM Recipe WHERE Recipe.name LIKE :name%", nativeQuery = true)
-    List<String> getNames(@Param("name") String name);
+    @Query(value = "SELECT r.* FROM recipe r WHERE r.name LIKE :name%", nativeQuery = true)
+    List<Recipe> getNames(@Param("name") String name);
 }
