@@ -21,6 +21,10 @@ public class Recipe {
 
     private String timeInAdvance;
 
+
+
+    private String imageUrl;
+
     @ManyToOne (fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "rating_id")
     private Rating rating;
@@ -175,5 +179,13 @@ public class Recipe {
 
     public List<RecipePrepStep> getRecipePrepStep() {
         return recipePrepStep;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }
