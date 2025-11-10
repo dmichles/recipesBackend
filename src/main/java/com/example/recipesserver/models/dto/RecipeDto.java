@@ -15,6 +15,7 @@ public class RecipeDto {
     private String comments;
     private String prepMethod;
     private String type;
+    private String imageUrl;
 
     private List<IngredientDto> ingredients;
     private List<PrepStepDto> prepSteps;
@@ -134,6 +135,12 @@ public class RecipeDto {
         this.id = id;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
     @Override
     public String toString() {
         return "RecipeDto{" +

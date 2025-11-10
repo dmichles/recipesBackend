@@ -70,6 +70,7 @@ public class RecipeController {
         System.out.println(recipeDto);
         Recipe recipe = new Recipe();
         recipe.setName(recipeDto.getName());
+        recipe.setImageUrl(recipeDto.getImageUrl());
         recipe.setComments(recipeDto.getComments());
         recipe.setServings(recipeDto.getServings());
         recipe.setSource(recipeDto.getSource());
