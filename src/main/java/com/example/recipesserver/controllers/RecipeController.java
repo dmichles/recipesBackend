@@ -122,6 +122,7 @@ public class RecipeController {
         System.out.println(recipeDto);
         Optional<Recipe> recipe = recipeRepository.findById(Long.valueOf(recipeDto.getId()));
         recipe.get().setName(recipeDto.getName());
+        recipe.get().setImageUrl(recipeDto.getImageUrl());
         recipe.get().setComments(recipeDto.getComments());
         recipe.get().setServings(recipeDto.getServings());
         recipe.get().setSource(recipeDto.getSource());
@@ -195,6 +196,8 @@ public class RecipeController {
         RecipeDto recipeDto = new RecipeDto();
         recipeDto.setId(String.valueOf(recipe.getRecipeId()));
         recipeDto.setName(recipe.getName());
+        System.out.println(recipe.getImageUrl());
+        recipeDto.setImageUrl(recipe.getImageUrl());
         recipeDto.setComments(recipe.getComments());
         recipeDto.setServings(recipe.getServings());
         recipeDto.setSource(recipe.getSource());
@@ -228,6 +231,7 @@ public class RecipeController {
             prepSteps.add(PrepStepDto);
         });
         recipeDto.setPrepSteps(prepSteps);
+        System.out.println(recipeDto.getImageUrl());
         return ResponseEntity.ok(recipeDto);
     }
 

@@ -21,8 +21,6 @@ public class Recipe {
 
     private String timeInAdvance;
 
-
-
     private String imageUrl;
 
     @ManyToOne (fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
@@ -182,9 +180,12 @@ public class Recipe {
     }
 
     public String getImageUrl() {
+        if (imageUrl == null) {
+            System.out.println("null");
+        }
+        System.out.println("imageUrl: " + imageUrl);
         return imageUrl;
     }
-
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
