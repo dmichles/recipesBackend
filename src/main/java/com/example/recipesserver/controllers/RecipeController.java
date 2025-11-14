@@ -290,7 +290,7 @@ public class RecipeController {
 
 
 
-    @CrossOrigin(origins = "http://74.102.78.122")
+    @CrossOrigin(origins = "*")
     @GetMapping("/getCuisines")
     public ResponseEntity<?> getCuisines() {
         List<CuisineDto> cuisines = new ArrayList<>();
