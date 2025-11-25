@@ -45,7 +45,7 @@ public class RecipeController {
         this.recipePrepStepRepository = recipePrepStepRepository;
     }
 
-    @CrossOrigin(origins = "http://localhost:5173")
+    @CrossOrigin(origins = "*")
     @DeleteMapping("/deleteRecipe")
     @Transactional
     public ResponseEntity<?> deleteRecipe(@RequestParam String id){
@@ -63,7 +63,7 @@ public class RecipeController {
         return ResponseEntity.ok().build();
     }
 
-    @CrossOrigin(origins = "http://localhost:5173")
+    @CrossOrigin(origins = "*")
     @PostMapping ("/addRecipe")
     public ResponseEntity<?> createRecipe(@RequestBody RecipeDto recipeDto) {
 
@@ -115,7 +115,7 @@ public class RecipeController {
         return ResponseEntity.ok(createRecipeDto);
     }
 
-    @CrossOrigin(origins = "http://localhost:5173")
+    @CrossOrigin(origins = "*")
     @PutMapping("/updateRecipe")
     @Transactional
     public ResponseEntity<?> updateRecipe(@RequestBody RecipeDto recipeDto) {
@@ -186,7 +186,7 @@ public class RecipeController {
         return ResponseEntity.ok(createRecipeDto);
     }
 
-    @CrossOrigin(origins = "http://localhost:5173")
+    @CrossOrigin(origins = "*")
     @GetMapping("/getRecipe")
     public ResponseEntity<?> getRecipe(@RequestParam String id) {
         if (id == null || id.isEmpty() || recipeRepository.findById(Long.valueOf(id)).isEmpty()){
@@ -236,7 +236,7 @@ public class RecipeController {
     }
 
 
-    @CrossOrigin(origins = "http://localhost:5173")
+    @CrossOrigin(origins = "*")
     @GetMapping("/getRecipeNames")
     public ResponseEntity<?> getRecipeNames(@RequestParam String name) {
         List<RecipeNameDto> recipeNameDtos = new ArrayList<>();
@@ -252,7 +252,7 @@ public class RecipeController {
         return ResponseEntity.ok(recipeNameDtos);
     }
 
-    @CrossOrigin(origins = "http://localhost:5173")
+    @CrossOrigin(origins = "*")
     @GetMapping("/getRecipeNamesByParams")
     public ResponseEntity<?> getRecipeNamesByParams (@RequestParam String category, @RequestParam String subcategory,
                                             @RequestParam String type, @RequestParam String cuisine,
